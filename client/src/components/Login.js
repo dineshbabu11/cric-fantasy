@@ -11,10 +11,6 @@ import { useNavigate } from 'react-router-dom'
 
     const onSubmit = async (e) => {
         e.preventDefault()
-        // const email = this.state.email
-        // const password = this.state.password
-
-        console.log(email + "..." + password)
 
         const res = await fetch("/signin", {
             method: 'POST',

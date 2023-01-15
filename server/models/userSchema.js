@@ -28,6 +28,28 @@ const userSchema = new mongoose.Schema({
                 required: true
             }
         }
+    ],
+
+    matches : [
+        {
+            matchid : {
+                type : Number,
+                required: true
+            },
+            team : {
+                type : String
+            },
+            batsman : {
+                type: String
+            },
+            bowler : {
+                type: String
+            },
+            mom : {
+                type: String
+            }
+
+        }
     ]
 })
 

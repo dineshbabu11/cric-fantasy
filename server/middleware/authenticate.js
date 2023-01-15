@@ -6,8 +6,7 @@ dotenv.config({path: './config.env'})
 
 const authenticate = async (req, res, next) =>{
     try{
-        const token = req.cookies.crictoken;
-        console.log(token)
+        const token = req.cookies.crictoken
 
         const verifyToken = jwt.verify(token, process.env.SECRET_KEY)
         
@@ -16,7 +15,6 @@ const authenticate = async (req, res, next) =>{
         if(!rootUser) {throw new Error('User not found')}
         req.token = token
         req.rootUser = rootUser
-        req.userId = rootUser._id
 
         next()
 

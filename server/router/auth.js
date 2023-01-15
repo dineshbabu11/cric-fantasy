@@ -1,10 +1,12 @@
 const express = require('express')
 const User = require('../models/userSchema')
+const Match = require('../models/matchSchema')
 const router = express.Router()
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const authenticate = require('../middleware/authenticate')
 const cookieParser = require('cookie-parser')
+
 
 require('../db/conn')
 
@@ -15,7 +17,15 @@ router.get('/', (req, res)=>{
 })
 
 router.post('/register', async (req,res)=>{
+    const matches = await Match.find({})
+
+    let matchids = []
+    matches.map((match)=>{
+        matchids = matchids.concat({"matchid" : match.matchid})
+    })
+    
     const {name, email, password, cpassword} = req.body
+
     if(!name || !email || !password || !cpassword){
         return res.status(422).json({error : "Please fill all the fields!!!"})
     }
@@ -28,7 +38,7 @@ router.post('/register', async (req,res)=>{
             return res.json({error: "Passwords not matching"})
         }
 
-        const user = new User({name, email, password, cpassword})
+        const user = new User({name, email, password, cpassword, matches})
         await user.save()
 
         res.json({message : "User registered succesfully"})
@@ -70,9 +80,62 @@ router.post('/signin', async (req, res)=>{
 })
 
 router.get('/dashboard', authenticate, (req, res) => {
-    console.log('Inside dashboard')
-    console.log(req.rootUser.email)
     res.send(req.rootUser)
 })
+
+router.get('/matchesinfo', async (req,res) => {
+    try{
+        const matches = await Match.find({})
+        res.send(matches)
+
+    } catch(error){
+        console.log(error)
+    }
+
+})
+
+router.post('/getSelected', async (req,res) => {
+    
+    const token = req.cookies.crictoken
+    const verifyToken = jwt.verify(token, process.env.SECRET_KEY)
+    const rootUser = await User.findOne({_id: verifyToken._id, "tokens.token": token})
+
+    const selected = req.body
+    
+    try{
+        console.log("Root user details: " + req.rootUser)
+        const user = await User.findOne({email : rootUser.email})
+        console.log(user.email)
+        let matches = user.matches
+        let index = false
+        console.log("Selected : \n\n")
+        console.log(selected)
+
+        selected.map((select) => {
+            console.log(select)
+            for(let i = 0 ; i < matches.length; i++) {
+                const item = matches[i]
+                if (item.matchid == select.matchid){
+                    index = i
+                }
+            }
+            console.log("index : " + index)
+            matches[index] = select
+    
+            user.matches = matches
+            
+        })
+
+        await user.save()
+        
+        res.json({message: "Match details succesfully"})
+
+
+    } catch(error){
+        console.log(error)
+    }
+
+})
+
 
 module.exports = router
