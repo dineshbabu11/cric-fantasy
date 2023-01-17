@@ -1,133 +1,140 @@
-import React, {useEffect, useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {useNavigate} from 'react-router-dom'
 import {Grid} from '@material-ui/core'
-import ReactTable from "react-table"
+import '../App.css'
 
 const Results = () => {
 
-    const [scores, setScores] = useState(0)
-    const navigate = useNavigate()
-    const test = []
-
-    const columns = [{
-              Header: 'Match',
-              accessor: 'matchid'
-            },
-            {
-              Header: 'Batsman',
-              accessor: 'batsman'
-            },
-            {
-              Header: 'Bowler',
-              accessor: 'bowler'
-            },
-            {
-              Header: 'MOM',
-              accessor: 'mom'
-            },
-            {
-              Header: 'Winner',
-              accessor: 'winner'
-            }]
+  const [userData, setUserData] = useState([0])
   
-    const callResults = async () => {
-      let matches, highest, match, high, high_wickets, high_scores, mom, winner, data, display 
+  let matches, highest, match, high, high_wickets, high_scores, mom, winner, display, total
+  let index
+
+  const navigate = useNavigate()
+
+
+  
+    const fetchData = async () => {
       let displayList = []
+      try{
+
+        const res = await fetch('/userSelected', {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+            "Content-Type": 'application/json'
+          },
+          credentials: 'include'
+        })
+  
+        const data = await res.json() 
+  
+        matches = data["matches"]
+        highest = data["highest"]
+  
         
-        try{
-          const res = await fetch('/userSelected', {
-            method: 'GET',
-            headers: {
-              Accept: 'application/json',
-              "Content-Type": 'application/json'
-            },
-            credentials: 'include'
-          })
-    
-          const data = await res.json()
-          
-          matches = data["matches"]
-          highest = data["highest"]
-          let index = 0
-          matches.map(() => {
-              match = matches[index]
-              high = highest[index]
-              high_wickets = high.high_wickets.map((player) => {
-                return(player[1])
-              })
-              high_scores = high.high_scores.map((player) => {
-                return(player[1])
-              })
-
-              display = {matchid : "1348643"}
-
-              if(high_scores.indexOf(match.batsman) > -1 ){
-                display["batsman"] = match.batsman + "--" + 2
-              } else {
-                display["batsman"] = match.batsman + "--" + 0
-              }
-              if(high_wickets.indexOf(match.bowler) > -1 ){
-                display["bowler"] = match.bowler + "--" + 2
-              } else {
-                display["bowler"] = match.bowler + "--" + 0
-              }
-              if(high.mom['data'] == match.mom ){
-                display["mom"] = match.mom + "--" + 2
-              } else {
-                display["mom"] = match.mom + "--" + 0
-              }
-              if(high.winner == match.team ){
-                display["winner"] = match.team + "--" + 2
-              } else {
-                display["winner"] = match.team + "--" + 2
-              }
-              index = index + 1
-              displayList = displayList.concat(display)
-              
-          })
-
-          let dummyList = [1]
-
-          let rendering = dummyList.map(()=>{
-            return(     
-              <div>
-              <ReactTable>
-                data = {displayList}
-                columns = {columns}
-                defaultPageSize={2}
-                pageSizeOptions={[2,4,6]}
-              </ReactTable>
-              </div>         
-            )
-          })
-           
-
-          test.render = rendering
-
-          console.log(test.render)
-          
-          setScores(test)
-          
-        } catch(error){
-            console.log(error)
-            navigate('/')
-        }
+        index = 0
         
+        matches.map(() => {
+          total = 0
+          match = matches[index]
+          high = highest[index]
+          high_wickets = high.high_wickets.map((player) => {
+            return(player[1])
+          })
+          high_scores = high.high_scores.map((player) => {
+            return(player[1])
+          })
+  
+          display = {matchid : match.matchid}
+  
+          if(high_scores.indexOf(match.batsman) > -1 ){
+            display["batsman"] = match.batsman + "--" + 2
+            total = total + 2
+          } else {
+            display["batsman"] = match.batsman + "--" + 0
+          }
+          if(high_wickets.indexOf(match.bowler) > -1 ){
+            display["bowler"] = match.bowler + "--" + 2
+            total = total + 2
+          } else {
+            display["bowler"] = match.bowler + "--" + 0
+          }
+          if(high.mom['data'] == match.mom ){
+            display["mom"] = match.mom + "--" + 2
+            total = total + 2
+          } else {
+            display["mom"] = match.mom + "--" + 0
+          }
+          if(high.winner == match.team ){
+            display["winner"] = match.team + "--" + 2
+            total = total + 2
+          } else {
+            display["winner"] = match.team + "--" + 0
+          }
+          display["total"] = total
+          index = index + 1
+          displayList = displayList.concat(display)
+          
+      })
+
+      // data1.displayList = displayList
+  
+      setUserData(displayList)
+      
+  
+      } catch(error) {
+        console.log(error)
+        navigate('/')
+      }
+
     }
-    
 
     useEffect(() => {
-        callResults()
-      }, [])
+      fetchData()
+    }, [userData])
+    
 
-    return(
-        <>
-          {scores.render}
-        </>
+
+  let userData1 = [] 
+  
+  
+  return(
+    
+    <div className="App">
+    <h1>Students Table</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>MatchId</th>
+          <th>Batsman</th>
+          <th>Bowler</th>
+          <th>Man of Match</th>
+          <th>Winning Team</th>
+          <th>Points</th>
+        </tr>
+      </thead>
+      <tbody>
+        {userData.map((value, key)=> {
+          return (
+            <tr key={key}>
+              <td>{value.matchid}</td>
+              <td>{value.batsman}</td>
+              <td>{value.bowler}</td>
+              <td>{value.mom}</td>
+              <td>{value.winner}</td>
+              <td>{value.total}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
+                   
         
-      
-        
-    )
+    
+    
+  )
 }
 
 export default Results

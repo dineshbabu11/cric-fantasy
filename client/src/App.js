@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Signup from './components/Signup'
 import Login from './components/Login'
 import Home from './components/Home';
-import Results from './components/Results1'
+import Results from './components/Results'
 
 
 class App extends Component{
