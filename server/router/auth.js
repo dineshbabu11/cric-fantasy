@@ -1,6 +1,7 @@
 const express = require('express')
 const User = require('../models/userSchema')
 const Match = require('../models/matchSchema')
+const High = require('../models/highestSchema')
 const router = express.Router()
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
@@ -94,6 +95,26 @@ router.get('/matchesinfo', async (req,res) => {
 
 })
 
+router.get('/userSelected', authenticate, async (req, res) => {
+
+    if(!req.rootUser) {
+        res.send(req.rootUser)
+    }
+
+    try{
+        const user = await User.findOne({email : req.rootUser.email})
+        // const user = await User.findOne({email : "dinesh.d.babu@gmail.com"})
+        const highest = await High.find({})
+        res.send({
+            'matches' : user.matches,
+            'highest' : highest
+        })
+
+    }catch(error){
+        console.log(error)
+    }
+})
+
 router.post('/getSelected', async (req,res) => {
     
     const token = req.cookies.crictoken
@@ -103,23 +124,18 @@ router.post('/getSelected', async (req,res) => {
     const selected = req.body
     
     try{
-        console.log("Root user details: " + req.rootUser)
         const user = await User.findOne({email : rootUser.email})
-        console.log(user.email)
         let matches = user.matches
         let index = false
-        console.log("Selected : \n\n")
-        console.log(selected)
 
         selected.map((select) => {
-            console.log(select)
             for(let i = 0 ; i < matches.length; i++) {
                 const item = matches[i]
                 if (item.matchid == select.matchid){
                     index = i
                 }
             }
-            console.log("index : " + index)
+            
             matches[index] = select
     
             user.matches = matches
@@ -128,7 +144,7 @@ router.post('/getSelected', async (req,res) => {
 
         await user.save()
         
-        res.json({message: "Match details succesfully"})
+        res.json({message: "Match details added succesfully"})
 
 
     } catch(error){

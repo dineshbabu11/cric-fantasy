@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv')
 dotenv.config({path: '../config.env'})
 
-const userSchema = new mongoose.Schema({
+const matchSchema = new mongoose.Schema({
     matchid : {
         type: Number,
         required: true
@@ -21,6 +21,6 @@ const userSchema = new mongoose.Schema({
 
 
 
-const Match = mongoose.model('MATCH', userSchema)
+const Match = mongoose.model('MATCH', matchSchema)
 
 module.exports = Match

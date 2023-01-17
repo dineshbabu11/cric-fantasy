@@ -217,6 +217,7 @@ const Home = () => {
       data.matches = matches
 
       //console.log(data)
+      console.log("Inside home")
       setUserData(data)
 
     } catch(error) {
