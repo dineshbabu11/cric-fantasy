@@ -30,51 +30,54 @@ const Results = () => {
         const data = await res.json() 
   
         matches = data["matches"]
-        highest = data["highest"]
-  
+        highest = data["highest"]  
         
         index = 0
         
         matches.map(() => {
           total = 0
           match = matches[index]
-          high = highest[index]
-          high_wickets = high.high_wickets.map((player) => {
-            return(player[1])
-          })
-          high_scores = high.high_scores.map((player) => {
-            return(player[1])
-          })
-  
-          display = {matchid : match.matchid}
-  
-          if(high_scores.indexOf(match.batsman) > -1 ){
-            display["batsman"] = match.batsman + "--" + 2
-            total = total + 2
-          } else {
-            display["batsman"] = match.batsman + "--" + 0
+          if(highest.length > 0){
+            high = highest[index]
+            high_wickets = high.high_wickets.map((player) => {
+              return(player[1])
+            })
+            high_scores = high.high_scores.map((player) => {
+              return(player[1])
+            })
+    
+            display = {matchid : match.matchid}
+    
+            if(high_scores.indexOf(match.batsman) > -1 ){
+              display["batsman"] = match.batsman + "--" + 2
+              total = total + 2
+            } else {
+              display["batsman"] = match.batsman + "--" + 0
+            }
+            if(high_wickets.indexOf(match.bowler) > -1 ){
+              display["bowler"] = match.bowler + "--" + 2
+              total = total + 2
+            } else {
+              display["bowler"] = match.bowler + "--" + 0
+            }
+            if(high.mom['data'] == match.mom ){
+              display["mom"] = match.mom + "--" + 2
+              total = total + 2
+            } else {
+              display["mom"] = match.mom + "--" + 0
+            }
+            if(high.winner == match.team ){
+              display["winner"] = match.team + "--" + 2
+              total = total + 2
+            } else {
+              display["winner"] = match.team + "--" + 0
+            }
+            display["total"] = total
+            index = index + 1
+            displayList = displayList.concat(display)
+
           }
-          if(high_wickets.indexOf(match.bowler) > -1 ){
-            display["bowler"] = match.bowler + "--" + 2
-            total = total + 2
-          } else {
-            display["bowler"] = match.bowler + "--" + 0
-          }
-          if(high.mom['data'] == match.mom ){
-            display["mom"] = match.mom + "--" + 2
-            total = total + 2
-          } else {
-            display["mom"] = match.mom + "--" + 0
-          }
-          if(high.winner == match.team ){
-            display["winner"] = match.team + "--" + 2
-            total = total + 2
-          } else {
-            display["winner"] = match.team + "--" + 0
-          }
-          display["total"] = total
-          index = index + 1
-          displayList = displayList.concat(display)
+          
           
       })
 
@@ -102,7 +105,7 @@ const Results = () => {
   return(
     
     <div className="App">
-    <h1>Students Table</h1>
+    <h1>Points Table</h1>
     <table>
       <thead>
         <tr>
@@ -129,6 +132,7 @@ const Results = () => {
         })}
       </tbody>
     </table>
+    {userData.length == 0 && <h1>First match complete ayyaka chudara rey results</h1>}
   </div>
                    
         
