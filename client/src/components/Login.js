@@ -24,26 +24,30 @@ import { useNavigate } from 'react-router-dom'
 
         const data = await res.json()
         // Pending getting error codes back
-        if(data){
+
+        if(res.status == 400){
+            window.alert('Invalid Credentials')
+        } else {
+            window.alert('Login succesful!!!')
             navigate('/home')
         }
-        window.alert('Login succesful!!!')
     }
 
     return (   
-        <div>
+        <div id='loginform'>
+            <h2 id="headerTitle">Login</h2>
             <form method='POST' action="" onSubmit={onSubmit}>
-                <div>
+                <div className="row">
                     <input type="email" name="email" id="email" value={email} placeholder='Your email ID' 
                         onChange={(e) => setEmail(e.target.value)}
                     />
                 </div>
-                <div>
+                <div className="row">
                     <input type="password" name="password" id="password" value ={password} placeholder='Your password'
                         onChange={(e) => setPassword(e.target.value)}
                     />
                 </div>
-                <div>
+                <div id="button" className='row'>
                     <input type="submit" name="Login" value="Login"/>
                 </div>
             </form>

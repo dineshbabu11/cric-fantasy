@@ -13,7 +13,8 @@ const Home = () => {
   const [bats, setBats] = useState([])
   const [bowls, setBowls] = useState([])
   const [moms, setMoms] = useState([])
-  let userName
+  let userName, matches_sel, matches, mat_sel
+  let defTeam, defBat, defBowler, defMom
   
 
   const navigate = useNavigate()
@@ -37,7 +38,7 @@ const Home = () => {
 
   const momHandleChange = (event, matchid) => {
     const value = event.target.value
-    setMoms(moms => [...moms, {"mom": value, "matchid": matchid}]) 
+    setMoms(moms => [...moms, {"mom": value, "matchid": matchid}])
   }
 
   const onSubmit = async (event) => {
@@ -95,8 +96,6 @@ const Home = () => {
     newList_moms.forEach(item => map.set(item.matchid, {...map.get(item.matchid), ...item}))
     mergedArr = Array.from(map.values())
 
-    console.log("User name details : " + userName)
-
     const res = await fetch("/getSelected", {
       method: 'POST',
       headers: {
@@ -106,9 +105,6 @@ const Home = () => {
           mergedArr
       )
   })
-
-
-
   }
 
   const callHome = async () => {
@@ -124,16 +120,7 @@ const Home = () => {
 
       const data = await res.json()
       userName = data.email
-      
-      let matches, teams_display
-
-      matches = data.matches.map((match) => {
-        return(
-          <div> {match.matchid} </div>
-        )
-
-      })
-
+      matches_sel = data.matches
 
       const res_matches = await fetch('/matchesinfo', {
         method: 'GET',
@@ -145,18 +132,49 @@ const Home = () => {
       })
 
       const data_matches = await res_matches.json()
+      data_matches.sort((match1, match2) => {
+        return match1.matchid - match2.matchid
+      })
+
+      let pre_teams = []
+      let pre_bats = []
+      let pre_bowlers = []
+      let pre_moms = []
       matches = data_matches.map((match) => {
+        mat_sel = matches_sel.filter(item => item.matchid == match.matchid)
+        pre_teams = pre_teams.concat({"team": mat_sel[0].team, "matchid": mat_sel[0].matchid})
+        pre_bats = pre_bats.concat({"batsman": mat_sel[0].batsman, "matchid": mat_sel[0].matchid})
+        pre_bowlers = pre_bowlers.concat({"bowler": mat_sel[0].bowler, "matchid": mat_sel[0].matchid})
+        pre_moms = pre_moms.concat({"mom": mat_sel[0].mom, "matchid": mat_sel[0].matchid})
+
+        let flag = false
+        if(mat_sel.length > 0){
+          flag = true
+          defTeam = mat_sel[0].team
+          defBat = mat_sel[0].batsman
+          defBowler = mat_sel[0].bowler
+          defMom = mat_sel[0].mom
+        }
+        // console.log(flag)
+
         return(
           <Grid item xs={12} lg={5} style={{backgroundColor:'lightBlue', marginBottom:40, marginLeft:10, borderRadius:10}}>
             <h2>{match.matchid}</h2>
             <label >
               Pick your favorite Team:
-              <select name={match.matchId} onChange={(e, matchid) => teamHandleChange(e, match.matchid)}>
+              <select disabled={match.disable} name={match.matchId} onChange={(e, matchid) => teamHandleChange(e, match.matchid)}>
               <option key='blankKey' hidden value >Select</option>
                 {match.teams.map((team) => {
-                  return(
-                    <option value={team}>{team}</option>
-                  )
+                  if(defTeam == team){
+                    return(
+                      <option value={team} selected>{team}</option>
+                    )
+                  } else {
+                    return(
+                      <option value={team}>{team}</option>
+                    )
+                  }
+                  
                 })}
               </select>
             </label>
@@ -166,12 +184,19 @@ const Home = () => {
 
             <label >
               Pick your favorite Batsman:
-              <select name={match.matchId} onChange={(e, matchid) => batHandleChange(e, match.matchid)}>
+              <select disabled={match.disable} name={match.matchId} onChange={(e, matchid) => batHandleChange(e, match.matchid)}>
               <option key='blankKey' hidden value >Select</option>
                 {match.players.map((player) => {
-                  return(
-                    <option value={player.data}>{player.name}</option>
-                  )
+                  if(defBat == player.data){
+                    return(
+                      <option value={player.data} selected>{player.name}</option>
+                    )
+                  } else{
+                    return(
+                      <option value={player.data}>{player.name}</option>
+                    )
+                  }
+                  
                 })}
               </select>
             </label>
@@ -181,12 +206,19 @@ const Home = () => {
 
             <label >
               Pick your favorite Bowler:
-              <select name={match.matchId} onChange={(e, matchid) => bowlHandleChange(e, match.matchid)}>
+              <select disabled={match.disable} name={match.matchId} onChange={(e, matchid) => bowlHandleChange(e, match.matchid)}>
               <option key='blankKey' hidden value >Select</option>
                 {match.players.map((player) => {
-                  return(
-                    <option value={player.data}>{player.name}</option>
-                  )
+                  if(defBowler == player.data){
+                    return(
+                      <option value={player.data} selected>{player.name}</option>
+                    )
+                  } else{
+                    return(
+                      <option value={player.data}>{player.name}</option>
+                    )
+                  }
+                  
                 })}
               </select>
             </label>
@@ -196,12 +228,19 @@ const Home = () => {
 
             <label >
               Pick your Player of the Match:
-              <select name={match.matchId} onChange={(e, matchid) => momHandleChange(e, match.matchid)}>
+              <select disabled={match.disable} name={match.matchId} onChange={(e, matchid) => momHandleChange(e, match.matchid)}>
               <option key='blankKey' hidden value >Select</option>
                 {match.players.map((player) => {
-                  return(
-                    <option value={player.data}>{player.name}</option>
-                  )
+                  if(defMom == player.data){
+                    return(
+                      <option value={player.data} selected>{player.name}</option>
+                    )
+                  }else{
+                    return(
+                      <option value={player.data}>{player.name}</option>
+                    )
+                  }
+                  
                 })}
               </select>
             </label>
@@ -213,12 +252,31 @@ const Home = () => {
         )
 
       })
-
+      // console.log("All teams before changes")
+      // console.log(teams)
       data.matches = matches
 
       //console.log(data)
-      console.log("Inside home")
+
+      pre_teams.map((team) => {
+        setTeams(teams => [...teams, team])
+      })
+      
+      pre_bats.map((bat) => {
+        setBats(bats => [...bats, bat])
+
+      })
+
+      pre_bowlers.map((bowler) => {
+        setBowls(bowls => [...bowls, bowler])
+      })
+
+      pre_moms.map((mom) => {
+        setMoms(moms => [...moms, mom])
+      })
+
       setUserData(data)
+
 
     } catch(error) {
       console.log(error)

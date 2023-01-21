@@ -43,21 +43,22 @@ import React, { Component } from 'react'
 
     render(){
         return (
-            <div>
+            <div id='loginform'>
+                <h2 id="headerTitle">Register</h2>
                 <form method='POST'>
-                    <div>
+                    <div className="row">
                         <input type="text" name="name" id="name" placeholder='Your name' value={this.state.name} onChange={this.onChange} />
                     </div>
-                    <div>
+                    <div className="row">
                         <input type="email" name="email" id="email" placeholder='Your email ID' value={this.state.email} onChange={this.onChange} />
                     </div>
-                    <div>
+                    <div className="row">
                         <input type="password" name="password" id="password" placeholder='Your password' value={this.state.password} onChange={this.onChange}/>
                     </div>
-                    <div>
+                    <div className="row">
                         <input type="password" name="cpassword" id="cpassword" placeholder='Confirm your password' value={this.state.cpassword} onChange={this.onChange}/>
                     </div>
-                    <div>
+                    <div id="button" className='row'>
                         <input type="submit" name="signup" value="Register" onClick={this.onClick}/>
                     </div>
                 </form>

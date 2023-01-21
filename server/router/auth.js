@@ -65,7 +65,7 @@ router.post('/signin', async (req, res)=>{
         const isMatch = await bcrypt.compare(password, user.password)
 
         if(!isMatch){
-            return res.json({error: "Invalid Credentials"})
+            return res.status(400).json({error: "Invalid Credentials"})
         }
         const token = await user.genAuthToken()
         
@@ -112,6 +112,15 @@ router.get('/userSelected', authenticate, async (req, res) => {
 
     }catch(error){
         console.log(error)
+    }
+})
+
+router.get('/leaderboard', async (req,res) => {
+    try{
+        const users = await User.find({})
+        res.send(users)
+    } catch(error){
+        console.log(err)
     }
 })
 

@@ -30,9 +30,15 @@ const Results = () => {
         const data = await res.json() 
   
         matches = data["matches"]
-        highest = data["highest"]  
-        
-        index = 0
+        highest = data["highest"]
+        matches.sort((match1, match2) => {
+          return match1.matchid - match2.matchid
+        })
+        highest.sort((match1, match2) => {
+          return match1.matchid - match2.matchid
+        })
+        // console.log(matches)
+        index = 0        
         
         matches.map(() => {
           total = 0
@@ -45,14 +51,19 @@ const Results = () => {
             high_scores = high.high_scores.map((player) => {
               return(player[1])
             })
+
+            // console.log(high_scores)
     
             display = {matchid : match.matchid}
-    
+            
             if(high_scores.indexOf(match.batsman) > -1 ){
               display["batsman"] = match.batsman + "--" + 2
               total = total + 2
             } else {
               display["batsman"] = match.batsman + "--" + 0
+            }
+            if(!match.batsman){
+              display["batsman"] = "-"
             }
             if(high_wickets.indexOf(match.bowler) > -1 ){
               display["bowler"] = match.bowler + "--" + 2
@@ -60,17 +71,27 @@ const Results = () => {
             } else {
               display["bowler"] = match.bowler + "--" + 0
             }
-            if(high.mom['data'] == match.mom ){
+            if(!match.bowler){
+              display["bowler"] = "-"
+            }
+            if(high.mom && high.mom['data'] == match.mom ){
               display["mom"] = match.mom + "--" + 2
               total = total + 2
             } else {
               display["mom"] = match.mom + "--" + 0
             }
-            if(high.winner == match.team ){
+            if(!match.mom){
+              display["mom"] = "-"
+            }
+            // console.log(match.team + "...." + high.matchid + "...." +  high.winner)
+            if(high.winner && high.winner == match.team ){
               display["winner"] = match.team + "--" + 2
               total = total + 2
             } else {
               display["winner"] = match.team + "--" + 0
+            }
+            if(!match.team){
+              display["winner"] = "-"
             }
             display["total"] = total
             index = index + 1
@@ -97,10 +118,6 @@ const Results = () => {
       fetchData()
     }, [userData])
     
-
-
-  let userData1 = [] 
-  
   
   return(
     
